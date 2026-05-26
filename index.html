@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>אימון כוח</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --y:#C9900A;--yb:#FFF8E6;--ybr:#F0C842;
+  --bg:#F5F3EE;--bg2:#EDEAE2;--card:#fff;
+  --border:#DDD8CE;--text:#1C1A17;--muted:#888;
+  --green:#1E6B41;--gb:#EAF5EF;
+  --red:#B83025;--rb:#FDECEA;
+  --blue:#1A5899;--bb:#EAF1FB;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{font-family:"Heebo",sans-serif;background:var(--bg);color:var(--text);direction:rtl;max-width:480px;margin:0 auto;}
+
+.hero{background:linear-gradient(150deg,#1C1200,#2E1E00 55%,#1C1200);padding:22px 16px 16px;text-align:center;border-bottom:3px solid var(--ybr);}
+.hero-tag{font-size:9px;letter-spacing:4px;color:var(--ybr);font-weight:700;margin-bottom:5px;opacity:.85;}
+.hero h1{font-size:22px;font-weight:900;color:#fff;line-height:1.2;}
+.hero h1 em{color:var(--ybr);font-style:normal;}
+.hero-sub{margin-top:5px;font-size:11px;color:#bbb;}
+
+/* TIMER */
+.timer-bar{background:#fff;border-bottom:1px solid var(--border);padding:10px 14px;display:flex;align-items:center;gap:8px;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+.timer-col{display:flex;flex-direction:column;align-items:center;gap:2px;position:relative;}
+.timer-val{font-size:24px;font-weight:900;letter-spacing:1px;font-variant-numeric:tabular-nums;min-width:65px;text-align:center;}
+.timer-val.go{color:var(--green);}
+.timer-val.rest{color:var(--red);}
+.timer-lbl{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
+.timer-divider{width:1px;height:44px;background:var(--border);}
+.timer-btns{display:flex;flex-direction:column;gap:4px;margin-right:auto;flex:1;}
+.timer-row-layout{display:flex;gap:4px;width:100%;}
+.tbtn{border:none;border-radius:7px;padding:6px 10px;font-size:11px;font-weight:700;font-family:"Heebo",sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.tbtn-main{background:var(--y);color:#fff;flex:1;}
+.tbtn-reset{background:var(--bg2);color:var(--text);padding:6px 8px;width:30px;}
+.tbtn-rest{background:var(--bg2);color:var(--text);flex:1;}
+.tbtn-rest.active{background:var(--rb);color:var(--red);}
+.timer-prog{height:3px;background:var(--bg2);}
+.timer-prog-fill{height:3px;background:var(--y);transition:width .1s linear;width:0%;}
+
+/* TABS */
+.tabs{display:flex;background:#fff;border-bottom:2px solid var(--border);position:sticky;top:0;z-index:99;box-shadow:0 2px 6px rgba(0,0,0,.07);}
+.tab{flex:1;padding:12px 4px;text-align:center;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;}
+.tab.active{color:var(--y);border-bottom-color:var(--y);background:var(--yb);}
+
+.panel{display:none;padding:12px 12px 60px;}
+.panel.active{display:block;}
+
+.group-lbl{font-size:11px;font-weight:700;color:#fff;background:var(--y);border-radius:6px;padding:4px 11px;margin:12px 0 7px;display:inline-block;}
+
+/* EXERCISE CARD */
+.ex-card{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+.ex-head{display:flex;align-items:center;gap:10px;padding:11px 12px;cursor:pointer;user-select:none;}
+.num{width:28px;height:28px;border-radius:50%;background:var(--y);color:#fff;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ex-info{flex:1;min-width:0;}
+.ex-name{font-size:13px;font-weight:700;color:var(--text);}
+.ex-muscle{font-size:10px;color:var(--muted);margin-top:1px;}
+.chips{display:flex;gap:3px;flex-wrap:wrap;margin-top:3px;}
+.chip{padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap;}
+.cy{background:var(--yb);color:var(--y);}
+.cg{background:var(--gb);color:var(--green);}
+.cb{background:var(--bb);color:var(--blue);}
+.chev{font-size:14px;color:var(--muted);transition:transform .2s;flex-shrink:0;margin-right:auto;}
+.ex-card.open .chev{transform:rotate(180deg);}
+
+.ex-body{display:none;border-top:1px solid var(--border);padding-bottom:12px;}
+.ex-card.open .ex-body{display:block;}
+
+.ex-img-container {width:100%;height:180px;background:#fff;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--border);}
+.ex-img {max-width:100%;max-height:100%;object-fit:contain;padding:5px;}
+
+.settings-row{display:flex;flex-wrap:wrap;gap:5px;padding:8px 12px 4px;}
+.setting-badge{background:#fff3cd;border:1px solid #f0c842;border-radius:6px;padding:3px 9px;font-size:11px;font-weight:700;color:#7a5200;}
+
+.weight-tracker-box {margin:8px 12px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 10px;}
+.wt-title {font-size:10px;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;}
+.wt-fields {display:flex;gap:6px;}
+.wt-input {flex:1;border:1px solid var(--border);border-radius:6px;padding:6px;font-size:14px;text-align:center;font-family:"Heebo",sans-serif;font-weight:700;}
+.wt-input:focus {outline:none;border-color:var(--y);}
+.wt-btn {background:var(--y);color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:"Heebo",sans-serif;}
+.saved-wt-display {font-size:11px;color:var(--green);font-weight:700;margin-top:4px;display:none;}
+
+.set-lbl{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;padding:6px 12px 3px;}
+.set-row{display:flex;gap:6px;padding:0 12px 8px;}
+.set-dot{width:34px;height:34px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .15s;}
+.set-dot.done{background:var(--y);border-color:var(--y);color:#fff;}
+
+.tips-wrap{padding:0 12px;}
+.tips-t{font-size:9px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;}
+.tips{list-style:none;display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
+.tips li{font-size:11.5px;color:#444;line-height:1.5;display:flex;gap:7px;}
+.tips li::before{content:"→";color:var(--y);flex-shrink:0;font-weight:700;}
+
+/* WEEK */
+.week-row{display:flex;align-items:stretch;border-radius:10px;border:1px solid var(--border);margin-bottom:7px;overflow:hidden;background:var(--card);}
+.wr-day{width:40px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;background:#2E1E00;flex-shrink:0;padding:8px 3px;text-align:center;line-height:1.4;}
+.wr-body{flex:1;padding:8px 11px;}
+.wr-sport{font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.wr-detail{font-size:10.5px;color:#666;line-height:1.5;}
+.badge{padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;white-space:nowrap;}
+.b-swim{background:var(--bb);color:var(--blue);}
+.b-bike{background:#FEF2E2;color:#B55200;}
+.b-run{background:var(--gb);color:var(--green);}
+.b-str{background:var(--yb);color:var(--y);}
+.b-key{background:#F2ECFC;color:#6535A0;}
+
+.info-box{border-radius:10px;padding:11px 13px;margin-bottom:10px;font-size:12px;line-height:1.7;}
+.ib-y{background:var(--yb);border:1px solid var(--ybr);color:#5A3E00;}
+.ib-r{background:var(--rb);border:1px solid #F5C6C0;color:#6B1A14;}
+.info-box strong{display:block;margin-bottom:2px;font-size:12px;}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-tag">TechnoGym · Full Body</div>
+  <h1>אימון <em>כוח</em></h1>
+  <div class="hero-sub">11 תרגילים · מעקב משקלים ומנוחה</div>
+</div>
+
+<div class="timer-bar">
+  <div class="timer-col">
+    <div class="timer-val go" id="tWorkout">00:00</div>
+    <div class="timer-lbl">אימון</div>
+  </div>
+  <div class="timer-divider"></div>
+  <div class="timer-col">
+    <div class="timer-val" id="tRest" style="color:var(--muted)">--</div>
+    <div class="timer-lbl">מנוחה</div>
+  </div>
+  <div class="timer-btns">
+    <div class="timer-row-layout">
+      <button class="tbtn tbtn-main" id="btnStart" onclick="toggleWorkout()">▶ התחל</button>
+      <button class="tbtn tbtn-reset" onclick="resetWorkoutTimer()">↩</button>
+    </div>
+    <div class="timer-row-layout">
+      <button class="tbtn tbtn-rest" id="btnRest" onclick="cycleRest()">⏸ מנוחה 60ש'</button>
+      <button class="tbtn tbtn-reset" onclick="resetRestTimer()">↩</button>
+    </div>
+  </div>
+</div>
+<div class="timer-prog"><div class="timer-prog-fill" id="tProgFill"></div></div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showPanel('workout',this)">💪 אימון</div>
+  <div class="tab" onclick="showPanel('week',this)">🗓 שבועי</div>
+  <div class="tab" onclick="showPanel('goals',this)">🎯 מטרות</div>
+</div>
+
+<div id="workout" class="panel active"><div id="ex-list"></div></div>
+<div id="week"    class="panel"><div id="week-list"></div></div>
+<div id="goals"   class="panel"><div id="goals-list"></div></div>
+
+<script>
+const EXERCISES = [
+  {"id": "leg_press", "num": 1, "name": "Leg Press", "heb": "לחיצת רגליים", "muscle": "ארבע ראשי · ישבן · פנים הירך", "group": "legs", "kg": 60, "reps": 12, "sets": 3, "rest": 90, "settings": [{"label": "מרחק כיסא", "value": "6"}], "tips": ["כפות רגליים ברוחב כתפיים, קצת גבוה בפלטפורמה", "כופף לכ-90 מעלות — אל תגיע לנעילה בהארכה", "גב תחתון דבוק לרפידה כל הזמן"], "img": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Sled_Leg_Press/0.jpg"},
+  {"id": "leg_extension", "num": 2, "name": "Leg Extension", "heb": "פשיטת ברכיים", "muscle": "ארבע ראשי (קוואדריספס)", "group": "legs", "kg": 25, "reps": 12, "sets": 3, "rest": 60, "settings": [{"label": "מרחק ידית", "value": "2"}], "tips": ["עלייה מהירה, ירידה איטית 2–3 שניות", "כאב ברך קדמי? הפחת משקל מיד", "ללא נעילה מלאה בסוף התנועה"], "img": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Lever_Leg_Extension/0.jpg"},
+  {"id": "leg_curl", "num": 3, "name": "Leg Curl", "heb": "כפיפת ברכיים", "muscle": "חמסטרינגס — קריטי לרצים ורוכבים", "group": "legs", "kg": 25, "reps": 12, "sets": 3, "rest": 60, "settings": [{"label": "כיסא", "value": "7"}, {"label": "ידית קדמית", "value": "2"}, {"label": "קרסול", "value": "3"}], "tips": ["מאזן לקוואד — אל תדלג!", "ירידה איטית 3 שניות — הכי חשוב לברך", "אל תרים ישבן בזמן הכפיפה"], "img": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Lever_Seated_Leg_Curl/0.jpg"},
+  {"id": "adductor", "num": 4, "name": "Adductor", "heb": "קירוב ירכיים", "muscle": "פנים הירך — יציבות ברך, אגן וגלוטס", "group": "legs", "kg": 30, "reps": 15, "sets": 3, "rest": 60, "settings": [], "tips": ["התרגיל הכי חשוב לחיזוק גלוטס!", "מייצב ברך מהצד — חיוני לרצים", "תנועה מבוקרת, אל תיפול לסגירה"], "img": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Lever_Seated_Hip_Adduction/0.jpg"},
+  {"id": "calf_raise", "num": 5, "name": "Calf Raise", "heb": "עלייה על קצות אצבעות", "muscle": "תאומים · סולאוס", "group": "legs", "kg": 0, "reps": 20, "sets": 3, "rest": 45, "tips": ["עמוד על קצה מדרגה — עקב מחוץ לשפה", "עלה לגובה מקסימלי על קצות האצבעות", "רד לאט 3 שניות — מתח בגיד אכילס"], "img": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Standing_Calf_Raise/0.jpg"},
+  {"id": "shoulder_press", "num": 6, "name": "Shoulder Press", "heb": "לחיצת כתפיים", "muscle": "דלתואיד · טרפז עליון · טריצפס", "group": "upper", "kg": 15, "reps": 10, "sets": 3, "rest": 75, "settings": [{"label": "גובה כיסא", "value": "7"}], "tips": ["מרפקים ב-90 מעלות בנקודת ההתחלה", "גב דבוק לרפידה — לא לקמר!", "אל תנעל מרפקים בסוף"], "img": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Lever_Military_Press/0.jpg"},
+  {"id": "arm_curl", "num": 7, "name": "Arm Curl", "heb": "כפיפת ביצפס", "muscle": "ביצפס · ברכיאליס", "group": "upper", "kg": 20, "reps": 10, "sets": 3, "rest": 60, "settings": [], "tips": ["מרפקים קבועים — אל תשתמש בתנופה", "ירידה מלאה ואיטית — זה בונה", "אין צורך להגיע עד הכתף"], "img": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Lever_Preacher_Curl/0.jpg"},
+  {"id": "arm_extension", "num": 8, "name": "Arm Extension", "heb": "פשיטת טריצפס", "muscle": "טריצפס (3 ראשים)", "group": "upper", "kg": 15, "reps": 10, "sets": 3, "rest": 60, "settings": [], "tips": ["שב צמוד לרפידה, גב זקוף לחלוטין", "מרפקים מכוונים קדימה — לא לצדדים", "כתפיים למטה — כל העבודה מהמרפק בלבד"], "img": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Lever_Triceps_Extension/0.jpg"},
+  {"id": "pulldown", "num": 9, "name": "Pulldown", "heb": "משיכה לחזה", "muscle": "גב רחב · ביצפס · כתפיים אחוריות", "group": "upper", "kg": 25, "reps": 10, "sets": 3, "rest": 75, "settings": [], "tips": ["אחוז ברוחב כתפיים או רחב יותר", "משוך לחזה — לא לאחור", "חזרה איטית ומבוקרת — 3 שניות למעלה"], "img": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Cable_Pulldown/0.jpg"},
+  {"id": "total_abdominal", "num": 10, "name": "Total Abdominal", "heb": "בטן ישרה", "muscle": "רקטוס אבדומיניס · בטן עמוקה", "group": "core", "kg": 25, "reps": 15, "sets": 3, "rest": 45, "settings": [], "tips": ["כפיפת עמוד שדרה — לא משיכת ידיים", "נשוף בכפיפה, שאף בחזרה", "תנועה קטנה ומבוקרת"], "img": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Lever_Seated_Crunch/0.jpg"},
+  {"id": "plank", "num": 11, "name": "Plank", "heb": "פלאנק", "muscle": "ליבה עמוקה · גלוטס · כתפיים", "group": "core", "kg": 0, "reps": 2, "sets": 2, "rest": 30, "tips": ["גוף ישר כמו קרש — אל תרים ישבן", "בטן מכווצת, נשימה רגועה", "מבט לרצפה, צוואר ניטרלי"], "img": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Plank/0.jpg"}
+];
+
+const WEEK_PROGRAM = [
+  {"day": "ש'", "sport": "ריצה נפח", "detail": "90 דקות ריצה קלה בקצב נוח, דגש על סיבולת אירובית.", "type": "run"},
+  {"day": "א'", "sport": "אימון כוח", "detail": "האימון הנוכחי - Full Body במכשירים.", "type": "str"},
+  {"day": "ב'", "sport": "שחייה + ריצה", "detail": "בוקר: שחיית טכניקה ואינטרוולים. ערב: ריצה קלה.", "type": "key"},
+  {"day": "ג'", "sport": "מנוחה", "detail": "התאוששות מלאה, מתיחות קלות והליכה.", "type": "rest"},
+  {"day": "ד'", "sport": "אופניים אינטרוולים", "detail": "60 דקות על טריינר או כביש, עבודה בעצימות.", "type": "bike"},
+  {"day": "ה'", "sport": "אימון כוח", "detail": "סיבוב שני של אימון כוח שבועי לשימור מסה.", "type": "str"},
+  {"day": "ו'", "sport": "ריצת טמפו", "detail": "ריצה בקצב תחרות משולבת עם קטעי מעבר.", "type": "run"}
+];
+
+const GOALS = [
+  {"title": "שיפור כוח מרבי", "desc": "העלאת משקלי העבודה ב-Leg Press ובמשכי הגב בהדרגה ב-10%.", "status": "active"},
+  {"title": "חיזוק הליבה", "desc": "הגעה ל-3 סטים של פלאנק יציב במשך 60 שניות.", "status": "active"}
+];
+
+let workoutTimer = null;
+let workoutSeconds = 0;
+let restTimer = null;
+let restSeconds = 0;
+let restTarget = 0;
+
+function toggleWorkout() {
+  const btn = document.getElementById('btnStart');
+  if (workoutTimer) {
+    clearInterval(workoutTimer);
+    workoutTimer = null;
+    btn.innerText = "▶ המשך";
+  } else {
+    workoutTimer = setInterval(() => {
+      workoutSeconds++;
+      document.getElementById('tWorkout').innerText = formatTime(workoutSeconds);
+    }, 1000);
+    btn.innerText = "⏸ עצור";
+  }
+}
+
+function resetWorkoutTimer() {
+  clearInterval(workoutTimer);
+  workoutTimer = null;
+  workoutSeconds = 0;
+  document.getElementById('tWorkout').innerText = "00:00";
+  document.getElementById('btnStart').innerText = "▶ התחל";
+}
+
+function cycleRest() {
+  clearInterval(restTimer);
+  const restVal = document.getElementById('tRest');
+  restSeconds = 0;
+  restTarget = 60;
+  
+  restVal.style.color = "var(--red)";
+  restVal.innerText = restTarget + " ש'";
+  
+  restTimer = setInterval(() => {
+    restSeconds++;
+    let remaining = restTarget - restSeconds;
+    if (remaining <= 0) {
+      clearInterval(restTimer);
+      restVal.innerText = "DONE";
+      restVal.style.color = "var(--green)";
+      document.getElementById('tProgFill').style.width = "0%";
+    } else {
+      restVal.innerText = remaining + " ש'";
+      let pct = (restSeconds / restTarget) * 100;
+      document.getElementById('tProgFill').style.width = pct + "%";
+    }
+  }, 1000);
+}
+
+function resetRestTimer() {
+  clearInterval(restTimer);
+  restTimer = null;
+  restSeconds = 0;
+  const restVal = document.getElementById('tRest');
+  restVal.style.color = "var(--muted)";
+  restVal.innerText = "--";
+  document.getElementById('tProgFill').style.width = "0%";
+}
+
+function formatTime(sec) {
+  let m = Math.floor(sec / 60).toString().padStart(2, '0');
+  let s = (sec % 60).toString().padStart(2, '0');
+  return `${m}:${s}`;
+}
+
+function showPanel(id, tabEl) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(tabEl) tabEl.classList.add('active');
+}
+
+function toggleCard(cardEl) {
+  cardEl.classList.toggle('open');
+}
+
+function toggleDot(dotEl) {
+  dotEl.classList.toggle('done');
+  event.stopPropagation();
+}
+
+function saveWeight(exId) {
+  const input = document.getElementById(`input-${exId}`);
+  const display = document.getElementById(`saved-${exId}`);
+  const chip = document.getElementById(`chip-kg-${exId}`);
+  if(!input) return;
+  const val = input.value.trim();
+  
+  if(val) {
+    localStorage.setItem(`weight_${exId}`, val);
+    if(display) {
+      display.innerText = `משקל אחרון שבוצע: ${val} ק"ג`;
+      display.style.display = "block";
+    }
+    if(chip) chip.innerText = `${val} ק"ג`;
+    alert("המשקל נשמר בהצלחה!");
+  }
+  event.stopPropagation();
+}
+
+function renderExercises() {
+  const container = document.getElementById('ex-list');
+  if(!container) return;
+  container.innerHTML = '';
+  
+  let currentGroup = '';
+  
+  EXERCISES.forEach(ex => {
+    if (ex.group !== currentGroup) {
+      currentGroup = ex.group;
+      let groupName = currentGroup === 'legs' ? 'רגליים' : currentGroup === 'upper' ? 'פלג גוף עליון' : 'ליבה';
+      container.innerHTML += `<div class="group-lbl">${groupName}</div>`;
+    }
+    
+    let settingsHtml = ex.settings ? ex.settings.map(s => `<span class="setting-badge">${s.label}: ${s.value}</span>`).join('') : '';
+    let tipsHtml = ex.tips ? ex.tips.map(t => `<li>${t}</li>`).join('') : '';
+    
+    let dotsHtml = '';
+    let totalSets = ex.sets || 3;
+    for (let i = 1; i <= totalSets; i++) {
+      dotsHtml += `<div class="set-dot" onclick="toggleDot(this)">${i}</div>`;
+    }
+    
+    const savedWeight = localStorage.getItem(`weight_${ex.id}`) || '';
+    const displayStyle = savedWeight ? 'block' : 'none';
+    
+    let cardHtml = `
+      <div class="ex-card" id="card-${ex.id}">
+        <div class="ex-head" onclick="toggleCard(this.parentElement)">
+          <div class="num">${ex.num}</div>
+          <div class="ex-info">
+            <div class="ex-name">${ex.heb} <span style="font-size:11px; color:var(--muted); font-weight:400;">(${ex.name})</span></div>
+            <div class="ex-muscle">${ex.muscle}</div>
+            <div class="chips">
+              <span class="chip cy" id="chip-kg-${ex.id}">${savedWeight ? savedWeight + ' ק"ג' : (ex.kg > 0 ? ex.kg + ' ק"ג' : 'משקל גוף')}</span>
+              <span class="chip cg">${ex.reps} חזרות</span>
+              <span class="chip cb">${ex.rest} ש' מנוחה</span>
+            </div>
+          </div>
+          <div class="chev">▼</div>
+        </div>
+        <div class="ex-body">
+          <div class="ex-img-container">
+            <img src="${ex.img}" class="ex-img" alt="${ex.name}">
+          </div>
+          ${settingsHtml ? `<div class="settings-row">${settingsHtml}</div>` : ''}
+          
+          <div class="weight-tracker-box" onclick="event.stopPropagation()">
+            <div class="wt-title">רישום ומעקב משקל קבוע:</div>
+            <div class="wt-fields">
+              <input type="number" id="input-${ex.id}" class="wt-input" placeholder="כמה הרמת? (ק״ג)" value="${savedWeight}">
+              <button class="wt-btn" onclick="saveWeight('${ex.id}')">💾 שמור</button>
+            </div>
+            <div class="saved-wt-display" id="saved-${ex.id}" style="display: ${displayStyle}">משקל אחרון שבוצע: ${savedWeight} ק"ג</div>
+          </div>
+
+          <div class="set-lbl">סטים וסימון ביצוע:</div>
+          <div class="set-row">${dotsHtml}</div>
+          <div class="tips-wrap">
+            <div class="tips-t">דגשים וטכניקה:</div>
+            <ul class="tips">${tipsHtml}</ul>
+          </div>
+        </div>
+      </div>
+    `;
+    container.innerHTML += cardHtml;
+  });
+}
+
+function renderWeek() {
+  const container = document.getElementById('week-list');
+  if(!container) return;
+  container.innerHTML = '';
+  WEEK_PROGRAM.forEach(item => {
+    let badgeClass = item.type === 'run' ? 'b-run' : item.type === 'swim' ? 'b-swim' : item.type === 'bike' ? 'b-bike' : item.type === 'str' ? 'b-str' : 'b-key';
+    container.innerHTML += `
+      <div class="week-row">
+        <div class="wr-day">${item.day}</div>
+        <div class="wr-body">
+          <div class="wr-sport">${item.sport} <span class="badge ${badgeClass}">${item.type.toUpperCase()}</span></div>
+          <div class="wr-detail">${item.detail}</div>
+        </div>
+      </div>
+    `;
+  });
+}
+
+function renderGoals() {
+  const container = document.getElementById('goals-list');
+  if(!container) return;
+  container.innerHTML = '';
+  GOALS.forEach(g => {
+    let boxClass = g.status === 'active' ? 'ib-y' : 'ib-r';
+    container.innerHTML += `
+      <div class="info-box ${boxClass}">
+        <strong>${g.title}</strong>
+        <div>${g.desc}</div>
+      </div>
+    `;
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderExercises();
+  renderWeek();
+  renderGoals();
+});
+</script>
+</body>
+</html>
