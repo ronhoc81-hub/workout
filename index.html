@@ -69,8 +69,9 @@ body{font-family:"Heebo",sans-serif;background:var(--bg);color:var(--text);direc
 .ex-body{display:none;border-top:1px solid var(--border);padding-bottom:12px;}
 .ex-card.open .ex-body{display:block;}
 
-.ex-img-container {width:100%;height:180px;background:#fff;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--border);}
-.ex-img {max-width:100%;max-height:100%;object-fit:contain;padding:5px;}
+.ex-img-container {width:100%;height:150px;background:var(--yb);overflow:hidden;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;border-bottom:1px solid var(--border);gap:8px;color:var(--y);}
+.ex-img-container svg {width:50px;height:50px;fill:currentColor;}
+.ex-img-title {font-size:12px;font-weight:700;}
 
 .settings-row{display:flex;flex-wrap:wrap;gap:5px;padding:8px 12px 4px;}
 .setting-badge{background:#fff3cd;border:1px solid #f0c842;border-radius:6px;padding:3px 9px;font-size:11px;font-weight:700;color:#7a5200;}
@@ -155,18 +156,24 @@ body{font-family:"Heebo",sans-serif;background:var(--bg);color:var(--text);direc
 <div id="goals"   class="panel"><div id="goals-list"></div></div>
 
 <script>
+const SVGS = {
+  legs: `<svg viewBox="0 0 24 24"><path d="M19.5 21a1.5 1.5 0 1 1-3 0V15h-1v6a1.5 1.5 0 1 1-3 0v-6h-1v6a1.5 1.5 0 1 1-3 0v-6h-1v6a1.5 1.5 0 1 1-3 0V10.5c0-.8.7-1.5 1.5-1.5h10c.8 0 1.5.7 1.5 1.5V21zM12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></svg>`,
+  upper: `<svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm7 7h-3.5c-.3 0-.6.2-.7.5L13.5 14H13v7a1 1 0 0 1-2 0v-7h-.5L9.2 9.5c-.1-.3-.4-.5-.7-.5H5a2 2 0 0 0-2 2v4a1 1 0 0 0 2 0v-3h1v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-8h1v3a1 1 0 0 0 2 0v-4a2 2 0 0 0-2-2z"/></svg>`,
+  core: `<svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 4c1.7 0 3 1.3 3 3s-1.3 3-3 3-3-1.3-3-3 1.3-3 3-3zm0 13.2c-2.7 0-5.1-1.4-6.4-3.5.1-1.5 3.1-2.4 6.4-2.4 3.3 0 6.3.9 6.4 2.4-1.3 2.1-3.7 3.5-6.4 3.5z"/></svg>`
+};
+
 const EXERCISES = [
-  {"id": "leg_press", "num": 1, "name": "Leg Press", "heb": "לחיצת רגליים", "muscle": "ארבע ראשי · ישבן · פנים הירך", "group": "legs", "kg": 60, "reps": 12, "sets": 3, "rest": 90, "settings": [{"label": "מרחק כיסא", "value": "6"}], "tips": ["כפות רגליים ברוחב כתפיים, קצת גבוה בפלטפורמה", "כופף לכ-90 מעלות — אל תגיע לנעילה בהארכה", "גב תחתון דבוק לרפידה כל הזמן"], "img": "https://upload.wikimedia.org/wikipedia/commons/c/c3/Leg_press_exercise_animation.gif"},
-  {"id": "leg_extension", "num": 2, "name": "Leg Extension", "heb": "פשיטת ברכיים", "muscle": "ארבע ראשי (קוואדריספס)", "group": "legs", "kg": 25, "reps": 12, "sets": 3, "rest": 60, "settings": [{"label": "מרחק ידית", "value": "2"}], "tips": ["עלייה מהירה, ירידה איטית 2–3 שניות", "כאב ברך קדמי? הפחת משקל מיד", "ללא נעילה מלאה בסוף התנועה"], "img": "https://upload.wikimedia.org/wikipedia/commons/5/5e/Leg_extensions_exercise_animation.gif"},
-  {"id": "leg_curl", "num": 3, "name": "Leg Curl", "heb": "כפיפת ברכיים", "muscle": "חמסטרינגס — קריטי לרצים ורוכבים", "group": "legs", "kg": 25, "reps": 12, "sets": 3, "rest": 60, "settings": [{"label": "כיסא", "value": "7"}, {"label": "ידית קדמית", "value": "2"}, {"label": "קרסול", "value": "3"}], "tips": ["מאזן לקוואד — אל תדלג!", "ירידה איטית 3 שניות — הכי חשוב לברך", "אל תרים ישבן בזמן הכפיפה"], "img": "https://upload.wikimedia.org/wikipedia/commons/d/df/Seated_leg_curl_exercise_animation.gif"},
-  {"id": "adductor", "num": 4, "name": "Adductor", "heb": "קירוב ירכיים", "muscle": "פנים הירך — יציבות ברך, אגן וגלוטס", "group": "legs", "kg": 30, "reps": 15, "sets": 3, "rest": 60, "settings": [], "tips": ["התרגיל הכי חשוב לחיזוק גלוטס!", "מייצב ברך מהצד — חיוני לרצים", "תנועה מבוקרת, אל תיפול לסגירה"], "img": "https://upload.wikimedia.org/wikipedia/commons/3/30/Inward_and_outward_thigh_exercise_animation.gif"},
-  {"id": "calf_raise", "num": 5, "name": "Calf Raise", "heb": "עלייה על קצות אצבעות", "muscle": "תאומים · סולאוס", "group": "legs", "kg": 0, "reps": 20, "sets": 3, "rest": 45, "tips": ["עמוד על קצה מדרגה — עקב מחוץ לשפה", "עלה לגובה מקסימלי על קצות האצבעות", "רד לאט 3 שניות — מתח בגיד אכילס"], "img": "https://upload.wikimedia.org/wikipedia/commons/d/dd/Calf_raises_exercise_animation.gif"},
-  {"id": "shoulder_press", "num": 6, "name": "Shoulder Press", "heb": "לחיצת כתפיים", "muscle": "דלתואיד · טרפז עליון · טריצפס", "group": "upper", "kg": 15, "reps": 10, "sets": 3, "rest": 75, "settings": [{"label": "גובה כיסא", "value": "7"}], "tips": ["מרפקים ב-90 מעלות בנקודת ההתחלה", "גב דבוק לרפידה — לא לקמר!", "אל תנעל מרפקים בסוף"], "img": "https://upload.wikimedia.org/wikipedia/commons/c/fe/Shoulder_press_exercise_animation.gif"},
-  {"id": "arm_curl", "num": 7, "name": "Arm Curl", "heb": "כפיפת ביצפס", "muscle": "ביצפס · ברכיאליס", "group": "upper", "kg": 20, "reps": 10, "sets": 3, "rest": 60, "settings": [], "tips": ["מרפקים קבועים — אל תשתמש בתנופה", "ירידה מלאה ואיטית — זה בונה", "אין צורך להגיע עד הכתף"], "img": "https://upload.wikimedia.org/wikipedia/commons/4/4b/Biceps_curl_machine_exercise_animation.gif"},
-  {"id": "arm_extension", "num": 8, "name": "Arm Extension", "heb": "פשיטת טריצפס", "muscle": "טריצפס (3 ראשים)", "group": "upper", "kg": 15, "reps": 10, "sets": 3, "rest": 60, "settings": [], "tips": ["שב צמוד לרפידה, גב זקוף לחלוטין", "מרפקים מכוונים קדימה — לא לצדדים", "כתפיים למטה — כל העבודה מהמרפק בלבד"], "img": "https://upload.wikimedia.org/wikipedia/commons/c/cd/Triceps_extension_exercise_animation.gif"},
-  {"id": "pulldown", "num": 9, "name": "Pulldown", "heb": "משיכה לחזה", "muscle": "גב רחב · ביצפס · כתפיים אחוריות", "group": "upper", "kg": 25, "reps": 10, "sets": 3, "rest": 75, "settings": [], "tips": ["אחוז ברוחב כתפיים או רחב יותר", "משוך לחזה — לא לאחור", "חזרה איטית ומבוקרת — 3 שניות למעלה"], "img": "https://upload.wikimedia.org/wikipedia/commons/e/ec/Lat_pulldown_exercise_animation.gif"},
-  {"id": "total_abdominal", "num": 10, "name": "Total Abdominal", "heb": "בטן ישרה", "muscle": "רקטוס אבדומיניס · בטן עמוקה", "group": "core", "kg": 25, "reps": 15, "sets": 3, "rest": 45, "settings": [], "tips": ["כפיפת עמוד שדרה — לא משיכת ידיים", "נשוף בכפיפה, שאף בחזרה", "תנועה קטנה ומבוקרת"], "img": "https://upload.wikimedia.org/wikipedia/commons/0/07/Crunch_machine_exercise_animation.gif"},
-  {"id": "plank", "num": 11, "name": "Plank", "heb": "פלאנק", "muscle": "ליבה עמוקה · גלוטס · כתפיים", "group": "core", "kg": 0, "reps": 2, "sets": 2, "rest": 30, "tips": ["גוף ישר כמו קרש — אל תרים ישבן", "בטן מכווצת, נשימה רגועה", "מבט לרצפה, צוואר ניטרלי"], "img": "https://upload.wikimedia.org/wikipedia/commons/2/23/Plank_exercise_animation.gif"}
+  {"id": "leg_press", "num": 1, "name": "Leg Press", "heb": "לחיצת רגליים", "muscle": "ארבע ראשי · ישבן · פנים הירך", "group": "legs", "kg": 60, "reps": 12, "sets": 3, "rest": 90, "settings": [{"label": "מרחק כיסא", "value": "6"}], "tips": ["כפות רגליים ברוחב כתפיים, קצת גבוה בפלטפורמה", "כופף לכ-90 מעלות — אל תגיע לנעילה בהארכה", "גב תחתון דבוק לרפידה כל הזמן"]},
+  {"id": "leg_extension", "num": 2, "name": "Leg Extension", "heb": "פשיטת ברכיים", "muscle": "ארבע ראשי (קוואדריספס)", "group": "legs", "kg": 25, "reps": 12, "sets": 3, "rest": 60, "settings": [{"label": "מרחק ידית", "value": "2"}], "tips": ["עלייה מהירה, ירידה איטית 2–3 שניות", "כאב ברך קדמי? הפחת משקל מיד", "ללא נעילה מלאה בסוף התנועה"]},
+  {"id": "leg_curl", "num": 3, "name": "Leg Curl", "heb": "כפיפת ברכיים", "muscle": "חמסטרינגס — קריטי לרצים ורוכבים", "group": "legs", "kg": 25, "reps": 12, "sets": 3, "rest": 60, "settings": [{"label": "כיסא", "value": "7"}, {"label": "ידית קדמית", "value": "2"}, {"label": "קרסול", "value": "3"}], "tips": ["מאזן לקוואד — אל תדלג!", "ירידה איטית 3 שניות — הכי חשוב לברך", "אל תרים ישבן בזמן הכפיפה"]},
+  {"id": "adductor", "num": 4, "name": "Adductor", "heb": "קירוב ירכיים", "muscle": "פנים הירך — יציבות ברך, אגן וגלוטס", "group": "legs", "kg": 30, "reps": 15, "sets": 3, "rest": 60, "settings": [], "tips": ["התרגיל הכי חשוב לחיזוק גלוטס!", "מייצב ברך מהצד — חיוני לרצים", "תנועה מבוקרת, אל תיפול לסגירה"]},
+  {"id": "calf_raise", "num": 5, "name": "Calf Raise", "heb": "עלייה על קצות אצבעות", "muscle": "תאומים · סולאוס", "group": "legs", "kg": 0, "reps": 20, "sets": 3, "rest": 45, "tips": ["עמוד על קצה מדרגה — עקב מחוץ לשפה", "עלה לגובה מקסימלי על קצות האצבעות", "רד לאט 3 שניות — מתח בגיד אכילס"]},
+  {"id": "shoulder_press", "num": 6, "name": "Shoulder Press", "heb": "לחיצת כתפיים", "muscle": "דלתואיד · טרפז עליון · טריצפס", "group": "upper", "kg": 15, "reps": 10, "sets": 3, "rest": 75, "settings": [{"label": "גובה כיסא", "value": "7"}], "tips": ["מרפקים ב-90 מעלות בנקודת ההתחלה", "גב דבוק לרפידה — לא לקמר!", "אל תנעל מרפקים בסוף"]},
+  {"id": "arm_curl", "num": 7, "name": "Arm Curl", "heb": "כפיפת ביצפס", "muscle": "ביצפס · ברכיאליס", "group": "upper", "kg": 20, "reps": 10, "sets": 3, "rest": 60, "settings": [], "tips": ["מרפקים קבועים — אל תשתמש בתנופה", "ירידה מלאה ואיטית — זה בונה", "אין צורך להגיע עד הכתף"]},
+  {"id": "arm_extension", "num": 8, "name": "Arm Extension", "heb": "פשיטת טריצפס", "muscle": "טריצפס (3 ראשים)", "group": "upper", "kg": 15, "reps": 10, "sets": 3, "rest": 60, "settings": [], "tips": ["שב צמוד לרפידה, גב זקוף לחלוטין", "מרפקים מכוונים קדימה — לא לצדדים", "כתפיים למטה — כל העבודה מהמרפק בלבד"]},
+  {"id": "pulldown", "num": 9, "name": "Pulldown", "heb": "משיכה לחזה", "muscle": "גב רחב · ביצפס · כתפיים אחוריות", "group": "upper", "kg": 25, "reps": 10, "sets": 3, "rest": 75, "settings": [], "tips": ["אחוז ברוחב כתפיים או רחב יותר", "משוך לחזה — לא לאחור", "חזרה איטית ומבוקרת — 3 שניות למעלה"]},
+  {"id": "total_abdominal", "num": 10, "name": "Total Abdominal", "heb": "בטן ישרה", "muscle": "רקטוס אבדומיניס · בטן עמוקה", "group": "core", "kg": 25, "reps": 15, "sets": 3, "rest": 45, "settings": [], "tips": ["כפיפת עמוד שדרה — לא משיכת ידיים", "נשוף בכפיפה, שאף בחזרה", "תנועה קטנה ומבוקרת"]},
+  {"id": "plank", "num": 11, "name": "Plank", "heb": "פלאנק", "muscle": "ליבה עמוקה · גלוטס · כתפיים", "group": "core", "kg": 0, "reps": 2, "sets": 2, "rest": 30, "tips": ["גוף ישר כמו קרש — אל תרים ישבן", "בטן מכווצת, נשימה רגועה", "מבט לרצפה, צוואר ניטרלי"]}
 ];
 
 const WEEK_PROGRAM = [
@@ -314,6 +321,7 @@ function renderExercises() {
     
     const savedWeight = localStorage.getItem(`weight_${ex.id}`) || '';
     const displayStyle = savedWeight ? 'block' : 'none';
+    const svgIcon = SVGS[ex.group] || '';
     
     let cardHtml = `
       <div class="ex-card" id="card-${ex.id}">
@@ -332,6 +340,71 @@ function renderExercises() {
         </div>
         <div class="ex-body">
           <div class="ex-img-container">
-            <img src="${ex.img}" class="ex-img" alt="${ex.name}">
+            ${svgIcon}
+            <div class="ex-img-title">קבוצת שרירים: ${ex.group === 'legs' ? 'רגליים' : ex.group === 'upper' ? 'פלג גוף עליון' : 'ליבה'}</div>
           </div>
-          ${settingsHtml ? `<div class="settings-row">${settingsHtml}</div>` : ''
+          ${settingsHtml ? `<div class="settings-row">${settingsHtml}</div>` : ''}
+          
+          <div class="weight-tracker-box" onclick="event.stopPropagation()">
+            <div class="wt-title">רישום ומעקב משקל קבוע:</div>
+            <div class="wt-fields">
+              <input type="number" id="input-${ex.id}" class="wt-input" placeholder="כמה הרמת? (ק״ג)" value="${savedWeight}">
+              <button class="wt-btn" onclick="saveWeight('${ex.id}')">💾 שמור</button>
+            </div>
+            <div class="saved-wt-display" id="saved-${ex.id}" style="display: ${displayStyle}">משקל אחרון שבוצע: ${savedWeight} ק"ג</div>
+          </div>
+
+          <div class="set-lbl">סטים וסימון ביצוע:</div>
+          <div class="set-row">${dotsHtml}</div>
+          <div class="tips-wrap">
+            <div class="tips-t">דגשים וטכניקה:</div>
+            <ul class="tips">${tipsHtml}</ul>
+          </div>
+        </div>
+      </div>
+    `;
+    container.innerHTML += cardHtml;
+  });
+}
+
+function renderWeek() {
+  const container = document.getElementById('week-list');
+  if(!container) return;
+  container.innerHTML = '';
+  WEEK_PROGRAM.forEach(item => {
+    let badgeClass = item.type === 'run' ? 'b-run' : item.type === 'swim' ? 'b-swim' : item.type === 'bike' ? 'b-bike' : item.type === 'str' ? 'b-str' : 'b-key';
+    container.innerHTML += `
+      <div class="week-row">
+        <div class="wr-day">${item.day}</div>
+        <div class="wr-body">
+          <div class="wr-sport">${item.sport} <span class="badge ${badgeClass}">${item.type.toUpperCase()}</span></div>
+          <div class="wr-detail">${item.detail}</div>
+        </div>
+      </div>
+    `;
+  });
+}
+
+function renderGoals() {
+  const container = document.getElementById('goals-list');
+  if(!container) return;
+  container.innerHTML = '';
+  GOALS.forEach(g => {
+    let boxClass = g.status === 'active' ? 'ib-y' : 'ib-r';
+    container.innerHTML += `
+      <div class="info-box ${boxClass}">
+        <strong>${g.title}</strong>
+        <div>${g.desc}</div>
+      </div>
+    `;
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderExercises();
+  renderWeek();
+  renderGoals();
+});
+</script>
+</body>
+</html>
